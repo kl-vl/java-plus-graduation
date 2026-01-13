@@ -1,5 +1,6 @@
 # Тестер
-## Скачать: [tester-0.0.1.jar](.github/workflows/stuff/tester-0.0.1.jar)
+## Скачать: [tester-0.0.1.jar](./tester-0.0.1.jar)
+External link: https://github.com/yandex-praktikum/java-plus-graduation/blob/ci/.github/workflows/stuff/tester-0.0.1.jar
 
 ## Пример запуска тестируем только коллектор, сохраняем отчёт в другой файл
 `java -jar tester.jar --tester.execution.mode=COLLECTION --tester.execution.output.file-path=./report.txt`
