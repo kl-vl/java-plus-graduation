@@ -2,6 +2,22 @@ info:
   app:
     name: delivery
 
-  #server.port=8080
-stats-server:
-  url: http://localhost:9090
+#server.port=8080
+stats:
+  server:
+    name: stats-server  # Имя сервиса в Eureka
+    url: http://localhost:9090  # Fallback URL
+  retry:
+    enabled: true
+    max-attempts: 3
+    initial-interval: 1000
+    multiplier: 2.0
+    max-interval: 10000
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    enabled: true
+  instance:
+    prefer-ip-address: true

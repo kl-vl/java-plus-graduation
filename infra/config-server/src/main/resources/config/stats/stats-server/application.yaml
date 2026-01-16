@@ -52,7 +52,7 @@ logging:
     org.springframework.transaction.interceptor: TRACE
 
 server:
-  port: 9090
+  port: 0 #9090
 #TODO 0 - переделать на дисковери клиент
 
 management:

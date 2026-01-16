@@ -23,6 +23,7 @@ public class MainServiceApplication {
         SpringApplication.run(MainServiceApplication.class, args);
     }
 
+    // TODO del
     @PostConstruct
     public void logConfigSource() {
         System.out.println(">>> CONFIG MESSAGE: " + startupMessage);

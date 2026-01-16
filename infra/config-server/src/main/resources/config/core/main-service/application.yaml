@@ -1,8 +1,9 @@
-info:
-  app:
-    name: main-service
-# настройки для переноса в конфиг
 spring:
+  application:
+    name: main-service
+  cloud:
+    discovery:
+      enabled: true
   jpa:
     hibernate:
       ddl-auto: none
@@ -34,6 +35,21 @@ logging:
 
 server:
   port: 0
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
+    enabled: true
+  instance:
+    prefer-ip-address: true
+    hostname: localhost
+
+stats:
+  server:
+    service-name: stats-server
 
 management:
   endpoints.web.exposure.include: health
