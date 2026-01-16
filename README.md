@@ -16,12 +16,10 @@ explore-with-me/
 
 ```
 
-#TODO
-
 - Spring Cloud Config Server — централизованное управление конфигурацией;
 - Spring Cloud Eureka — сервис регистрации и обнаружения;
 - Spring Cloud Gateway — API-шлюз для маршрутизации запросов.
-
+- Stats-client with DiscoveryClient - http клиент для сервер статистики с динамическим определением url  
 
 ### Модули сервера статистики
 - **stats/stats-server** - Web-сервер  для сбора и предоставления статистики

@@ -56,6 +56,8 @@ public class ClientRestStatImpl implements ClientRestStat {
 
     @Override
     public Boolean addStat(EndpointHitDto dto) {
+        log.info("[Stats Client] Sending hit: {}", dto);
+
         return retryTemplate.execute(context -> {
             URI statsServiceUri = buildStatsServiceUri(endpoints.getHit());
             log.debug("Calling stats service at: {}", statsServiceUri);
@@ -72,6 +74,7 @@ public class ClientRestStatImpl implements ClientRestStat {
                                       LocalDateTime end,
                                       List<String> uris,
                                       boolean unique) {
+        log.info("[Stats Client] Requesting stats: start={}, end={}, uris={}, unique={}", start, end, uris, unique);
         return retryTemplate.execute(context -> {
             URI statsServiceUri = buildStatsServiceUri(endpoints.getStats(), start, end, uris, unique);
             log.debug("Calling stats-server at: {}", statsServiceUri);
