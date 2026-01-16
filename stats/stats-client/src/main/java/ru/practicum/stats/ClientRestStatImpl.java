@@ -18,6 +18,30 @@ public class ClientRestStatImpl implements ClientRestStat {
     private final RestClient restClient;
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
+    // TODO можно заавтоваирить didcovery client
+    //private final DiscoveryClient discoveryClient;
+    //private final RetryTemplate retryTemplate;
+
+    // TODO
+/*    private ServiceInstance getInstance() {
+        try {
+            return discoveryClient
+                    .getInstances(statsServiceId)
+                    .getFirst();
+        } catch (Exception exception) {
+            throw new StatsServerUnavailable(
+                    "Ошибка обнаружения адреса сервиса статистики с id: " + statsServiceId,
+                    exception
+            );
+        }
+    }*/
+
+    // TODO метод наставника
+//    private URI makeUri(String path) {
+//        ServiceInstance instance = retryTemplate.execute(RetryContext context -> getInstance());
+//        return URI.create("http://" + instance.getHost() + ":" + instance.getPort() + path);
+//    }
+
     public ClientRestStatImpl(RestClient restClient) {
         this.restClient = restClient;
     }

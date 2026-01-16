@@ -1,0 +1,5 @@
+#spring.application.name=stats-client
+info.app.name=delivery
+
+#server.port=8080
+stats-server.url=http://localhost:9090

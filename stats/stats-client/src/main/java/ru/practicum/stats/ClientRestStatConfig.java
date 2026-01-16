@@ -8,6 +8,9 @@ import org.springframework.web.client.RestClient;
 @Configuration
 public class ClientRestStatConfig {
 
+    // TODO можно получить через Discovery Server адрес сервера статистики
+    // или использовать Feign-клиент
+
     @Value("${stats-server.url:http://localhost:9090}")
     private String statsServerUrl;
 
