@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Component;
@@ -56,16 +57,21 @@ public class ClientRestStatImpl implements ClientRestStat {
 
     @Override
     public Boolean addStat(EndpointHitDto dto) {
-        log.info("[Stats Client] Sending hit: {}", dto);
+        URI statsServiceUri = buildStatsServiceUri(endpoints.getHit());
 
         return retryTemplate.execute(context -> {
-            URI statsServiceUri = buildStatsServiceUri(endpoints.getHit());
-            log.debug("Calling stats service at: {}", statsServiceUri);
-            return restClient.post()
+            log.info("[Stats Client] Sending hit with id: {}", dto.getId());
+            log.debug("[Stats Client] Sending hit: {} to url: {}", dto, statsServiceUri);
+
+            Boolean result = restClient.post()
                     .uri(statsServiceUri)
+                    .contentType(MediaType.APPLICATION_JSON)
                     .body(dto)
                     .retrieve()
                     .body(Boolean.class);
+
+            log.info("[Stats Client] Response for hit id {}: {}", dto.getId(), result);
+            return result;
         });
     }
 
@@ -74,15 +80,22 @@ public class ClientRestStatImpl implements ClientRestStat {
                                       LocalDateTime end,
                                       List<String> uris,
                                       boolean unique) {
-        log.info("[Stats Client] Requesting stats: start={}, end={}, uris={}, unique={}", start, end, uris, unique);
+
         return retryTemplate.execute(context -> {
             URI statsServiceUri = buildStatsServiceUri(endpoints.getStats(), start, end, uris, unique);
-            log.debug("Calling stats-server at: {}", statsServiceUri);
+
+            log.info("[Stats Client] Requesting stats: start={}, end={}, uris={}, unique={}", start, end, uris, unique);
+            log.debug("[Stats Client] Requesting stats: start={}, end={}, uris={}, unique={} with url {}", start, end, uris, unique, statsServiceUri);
 
             ResponseEntity<ViewStatsDto[]> responseEntity = restClient.get()
                     .uri(statsServiceUri)
+                    .accept(MediaType.APPLICATION_JSON)
                     .retrieve()
                     .toEntity(ViewStatsDto[].class);
+
+            ViewStatsDto[] body = responseEntity.getBody();
+            log.info("[Stats Client] Stats received: {} items, status: {}", body != null ? body.length : 0, responseEntity.getStatusCode());
+            log.debug("[Stats Client] Response : {}", Arrays.toString(body));
 
             return responseEntity.getBody() != null ?
                     Arrays.asList(responseEntity.getBody()) :
@@ -131,7 +144,7 @@ public class ClientRestStatImpl implements ClientRestStat {
             List<ServiceInstance> instances = discoveryClient.getInstances(statsServerName);
 
             if (instances != null && !instances.isEmpty()) {
-                ServiceInstance instance = instances.get(0);
+                ServiceInstance instance = instances.getFirst();
                 String url = instance.getUri().toString();
                 log.debug("Found stats-server instance: {}", url);
                 return url;
