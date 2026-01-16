@@ -8,23 +8,6 @@ spring:
           uri: lb://main-service
           predicates:
             - Path=/**
-#        - id: main-service-admin-categories
-#          uri: lb://main-service
-#          predicates:
-#            - Path=/admin/categories/**
-#
-#        - id: main-service-admin-users
-#          uri: lb://main-service
-#          predicates:
-#            - Path=/admin/users/**
-#
-#        - id: main-service
-#          uri: lb://main-service
-#          predicates:
-#            - Path=/**
-#  /admin/categories/... → main-service
-#  /admin/users/... → main-service
-#  всё остальное → main-service
 
 server:
   port: 8080

@@ -2,11 +2,13 @@ info:
   app:
     name: delivery
 
-#server.port=8080
 stats:
   server:
-    name: stats-server  # Имя сервиса в Eureka
-    url: http://localhost:9090  # Fallback URL
+    name: stats-server  # имя сервиса в Eureka
+    url: http://localhost:9090  # fallback url
+    endpoints:
+      hit: /hit
+      stats: /stats
   retry:
     enabled: true
     max-attempts: 3

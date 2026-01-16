@@ -14,12 +14,6 @@ spring:
         max-interval: 10000
         max-attempts: 100
 
-#server:
-#  port: 0
-
-app:
-  startup-message: "Loaded from main-service application.yaml"
-
 eureka:
   client:
     registerWithEureka: true

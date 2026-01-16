@@ -28,7 +28,10 @@ public class ClientRestStatConfig {
     @Bean
     public RetryTemplate statsRetryTemplate(
             @Value("${stats.retry.enabled:true}") boolean retryEnabled,
-            @Value("${stats.retry.max-attempts:3}") int maxAttempts) {
+            @Value("${stats.retry.max-attempts:3}") int maxAttempts,
+            @Value("${stats.retry.initial-interval:1000}") long initialInterval,
+            @Value("${stats.retry.multiplier:2.0}") double multiplier,
+            @Value("${stats.retry.max-interval:10000}") long maxInterval) {
 
         RetryTemplate retryTemplate = new RetryTemplate();
 
@@ -37,11 +40,10 @@ public class ClientRestStatConfig {
             retryPolicy.setMaxAttempts(maxAttempts);
             retryTemplate.setRetryPolicy(retryPolicy);
 
-            // TODO в настройки
             ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
-            backOffPolicy.setInitialInterval(1000);
-            backOffPolicy.setMultiplier(2.0);
-            backOffPolicy.setMaxInterval(10000);
+            backOffPolicy.setInitialInterval(initialInterval);
+            backOffPolicy.setMultiplier(multiplier);
+            backOffPolicy.setMaxInterval(maxInterval);
             retryTemplate.setBackOffPolicy(backOffPolicy);
         } else {
             retryTemplate.setRetryPolicy(new NeverRetryPolicy());
@@ -55,8 +57,9 @@ public class ClientRestStatConfig {
                                          DiscoveryClient discoveryClient,
                                          RetryTemplate statsRetryTemplate,
                                          @Value("${stats.server.service-name:stats-server}") String serviceName,
-                                         @Value("${stats.server.fallback-url:http://localhost:9090}") String fallbackUrl) {
-        return new ClientRestStatImpl(statsRestClient, discoveryClient, statsRetryTemplate, serviceName, fallbackUrl);
+                                         @Value("${stats.server.fallback-url:http://localhost:9090}") String fallbackUrl,
+                                         StatsEndpointsProperties statsEndpointsProperties) {
+        return new ClientRestStatImpl(statsRestClient, discoveryClient, statsRetryTemplate, serviceName, fallbackUrl, statsEndpointsProperties);
     }
 
 }
