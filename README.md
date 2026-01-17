@@ -1,15 +1,25 @@
-# Explore With Me - Сервис статистики
-
+# Explore With Me - Сервис статистики с использованием микросервисной архитектуры и развёртыванием в облачных средах
 
 Многомодульная архитектура:
 ```
 explore-with-me/
-├── stats/                   # Сервис статистики
-│   ├── stats-server/        # Web-сервер статистики (Web-приложение, Dockerfile, 9090 порт)
-│   ├── stats-client/        # HTTP-клиент для работы с main-сервисом
-│   └── stats-dto/           # Общие DTO классы
-└── main-service/            # Основной сервис (8080 порт)
+├── infra/
+│   ├── config-server/      # служба конфигурации
+│   ├── discovery-server/   # служба обнаружения (Eureka)
+│   └── gateway-server/     # служба API-шлюза
+├── core/                   # группирующий модуль для основного сервиса:
+│   └── main-service/       # основной сервис
+└── stats/                  # Сервис статистики
+    ├── stats-server/       # Web-сервер статистики (Web-приложение)
+    ├── stats-client/       # HTTP-клиент для работы с main-сервисом через discovery-server
+    └── stats-dto/          # Общие DTO классы статистики
+
 ```
+
+- Spring Cloud Config Server — централизованное управление конфигурацией;
+- Spring Cloud Eureka — сервис регистрации и обнаружения;
+- Spring Cloud Gateway — API-шлюз для маршрутизации запросов.
+- Stats-client with DiscoveryClient - http клиент для сервер статистики с динамическим определением url  
 
 ### Модули сервера статистики
 - **stats/stats-server** - Web-сервер  для сбора и предоставления статистики

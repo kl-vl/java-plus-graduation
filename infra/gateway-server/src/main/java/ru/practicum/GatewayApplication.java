@@ -1,4 +1,4 @@
-package ru.practicum.stats;
+package ru.practicum;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -6,10 +6,9 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-public class StatsServerApplication {
-
+public class GatewayApplication {
     public static void main(String[] args) {
-        SpringApplication.run(StatsServerApplication.class, args);
+        SpringApplication.run(GatewayApplication.class, args);
     }
 
 }

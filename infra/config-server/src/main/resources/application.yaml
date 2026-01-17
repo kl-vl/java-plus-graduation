@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: config-server
+  profiles:
+    active: native
+  cloud:
+    config:
+      server:
+        native:
+          searchLocations:
+            - classpath:config/core/{application}
+            - classpath:config/infra/{application}
+            - classpath:config/stats/{application}
+
+server:
+  port: 0 #8888
+  shutdown: graceful
+
+eureka:
+  client:
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    preferIpAddress: false
+    hostname: localhost
+    instance-id: "${spring.application.name}:${random.value}"
+    #leaseRenewalIntervalInSeconds: 30
+
+management:
+  endpoints.web.exposure.include: health,info,metrics
