@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: code-common
+
+client:
+  service:
+    user:
+      name: user-service
+      path: /internal/users
+    event:
+      name: event-service
+      path: /internal/events
+    request:
+      name: request-service
+      path: /internal/requests

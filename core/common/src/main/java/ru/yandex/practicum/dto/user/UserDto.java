@@ -1,0 +1,33 @@
+package ru.yandex.practicum.dto.user;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.ToString;
+import ru.yandex.practicum.dto.validation.ValidationGroups;
+
+@AllArgsConstructor
+@Builder
+@Getter
+@ToString
+public class UserDto {
+
+    @Null(groups = ValidationGroups.Create.class)
+    private Long id;
+
+    @Email
+    @NotBlank
+    @Size(min = 6, max = 254)
+    private String email;
+
+    @NotNull(groups = ValidationGroups.Create.class)
+    @NotBlank
+    @Size(min = 2, max = 250)
+    private String name;
+
+}

@@ -14,7 +14,7 @@
 
     <groupId>ru.practicum</groupId>
     <artifactId>explore-with-me</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.3-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <properties>
@@ -29,7 +29,6 @@
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
         <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
         <mockwebserver.version>4.12.0</mockwebserver.version>
-        <!--        <jakarta.persistence-api.version>3.2.0</jakarta.persistence-api.version>-->
         <spring-boot-starter-validation.version>3.5.8</spring-boot-starter-validation.version>
         <spring-cloud-dependencies.version>2025.0.1</spring-cloud-dependencies.version>
         <caffeine.version>3.2.3</caffeine.version>
@@ -39,6 +38,7 @@
         <module>core</module>
         <module>infra</module>
         <module>stats</module>
+        <module>core/comment-service</module>
     </modules>
 
     <dependencyManagement>
