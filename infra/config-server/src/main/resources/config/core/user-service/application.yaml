@@ -46,7 +46,7 @@ eureka:
     hostname: localhost
 
 management:
-  endpoints.web.exposure.include: health
+  endpoints.web.exposure.include: health, info
 
 pagination:
   user:
