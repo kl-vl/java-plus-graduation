@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.api.RequestClient;
 import ru.yandex.practicum.dto.BooleanResponseDto;
 import ru.yandex.practicum.dto.request.ConfirmedRequestsCountDto;
-import ru.yandex.practicum.exception.EventNotFoundException;
-import ru.yandex.practicum.exception.ServiceException;
 import ru.yandex.practicum.request.service.RequestService;
 
 import java.util.List;

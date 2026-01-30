@@ -3,6 +3,7 @@ package ru.yandex.practicum.event;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -59,7 +60,6 @@ public class EventServiceImpl implements EventService {
     private final Validator validator;
     private final CategoryRepository categoryRepository;
     private final LocationRepository locationRepository;
-    private List<ViewStatsDto> stats;
     private final UserServiceClient userServiceClient;
     private final RequestServiceClient requestServiceClient;
 
@@ -72,7 +72,7 @@ public class EventServiceImpl implements EventService {
 
         if (errors.hasErrors()) {
             String errorMessage = errors.getAllErrors().stream()
-                    .map(error -> error.getDefaultMessage())
+                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
                     .collect(Collectors.joining(", "));
 
             throw new FilterValidationException("Filter validation failed: " + errorMessage);
@@ -237,7 +237,7 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public EventDtoFull createEvent(EventDto eventDto) throws
-            CategoryNotFoundException, UserNotFoundException, EventDateException, ru.yandex.practicum.exception.UserNotFoundException, ServiceException {
+            CategoryNotFoundException, EventDateException, UserNotFoundException, ServiceException {
         log.info("Main-service. createEvent input: id = {}", eventDto.getDescription());
 
         setDefaultValues(eventDto);
@@ -391,7 +391,7 @@ public class EventServiceImpl implements EventService {
         // views
         String uri = "/events/" + event.getId();
         List<ViewStatsDto> stats = clientRestStat.getStat(event.getCreatedOn().minusMinutes(1), LocalDateTime.now().plusMinutes(1), List.of(uri), true);
-        Long views = stats.isEmpty() ? 0L : stats.get(0).getHits();
+        Long views = stats.isEmpty() ? 0L : stats.getFirst().getHits();
         log.info("Main-service. enrichEvent: eventId = {}, hits = {} ", event.getId(), views);
         event.setViews(views);
     }

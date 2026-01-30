@@ -40,9 +40,6 @@ public class UserServiceImpl implements UserService {
 
         log.info("{}. findAll success: found {} users", getServiceName(), page.getNumberOfElements());
 
-//        return page.getContent().stream()
-//                .map(user -> new UserDto(user.getId(), user.getEmail(), user.getName()))
-//                .collect(Collectors.toList());
         return page.getContent().stream().map(userMapper::toUserDto).collect(Collectors.toList());
     }
 

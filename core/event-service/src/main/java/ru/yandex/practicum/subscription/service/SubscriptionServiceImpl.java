@@ -63,7 +63,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         }
 
         List<Long> subscribedUserIds = subscriptions.stream()
-                .map(SubscriptionDtoProjection::getSubscriberId) // ← вот это работает!
+                .map(SubscriptionDtoProjection::getSubscriberId)
                 .distinct()
                 .toList();
 

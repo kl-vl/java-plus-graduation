@@ -16,7 +16,7 @@ public interface EventClient {
     EventDtoFull getEventByInitiator(
             @PathVariable @Positive Long eventId,
             @PathVariable @Positive Long userId
-    )  throws EventNotFoundException;;
+    )  throws EventNotFoundException;
 
     @GetMapping("/{eventId}/exists")
     BooleanResponseDto existsEvent(@PathVariable @Positive Long eventId);
