@@ -1,0 +1,55 @@
+spring:
+  application:
+    name: comment-service
+  cloud:
+    discovery:
+      enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: none
+    database-platform=org:
+      hibernate:
+        dialect: PostgreSQLDialect
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        entitymanager:
+          factory:
+            interface: jakarta.persistence.EntityManagerFactory
+  sql:
+    init:
+      mode: always
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5433/comment_service
+    username: dbuser
+    password: 12345
+
+logging:
+  level:
+    ru.practicum.stats: INFO
+    #    org.springframework.web: INFO
+    #    org.springframework.validation: INFO
+    org.springframework.transaction.interceptor: TRACE
+
+server:
+  port: 0
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
+    enabled: true
+  instance:
+    prefer-ip-address: true
+    hostname: localhost
+
+stats:
+  server:
+    service-name: stats-server
+
+management:
+  endpoints.web.exposure.include: health

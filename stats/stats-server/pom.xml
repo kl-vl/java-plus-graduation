@@ -5,11 +5,11 @@
     <parent>
         <groupId>ru.practicum</groupId>
         <artifactId>stats</artifactId>
-        <version>0.0.2-SNAPSHOT</version>
+        <version>0.0.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>stats-server</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.3-SNAPSHOT</version>
     <name>stats-server</name>
     <description>Statistics server</description>
 

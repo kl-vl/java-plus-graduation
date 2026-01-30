@@ -3,21 +3,60 @@ spring:
     name: gateway-server
   cloud:
     gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
       routes:
-        - id: main-service
-          uri: lb://main-service
+        - id: user-service
+          uri: lb://user-service
           predicates:
-            - Path=/**
+            - Path=
+              /admin/users,
+              /admin/users/*,
+              /admin/users/*/short,
+              /admin/users/all/*
+          order: 1
+
+        - id: request-service
+          uri: lb://request-service
+          predicates:
+            - Path=
+              /requests/**,
+              /users/*/requests,
+              /users/*/requests/*/cancel,
+              /users/*/events/*/requests,
+              /users/*/events/*/check/participation
+          order: 2
+
+        - id: event-service
+          uri: lb://event-service
+          predicates:
+            #- Path=/**
+            - Path=
+              /admin/events/**,
+              /users/*/events,
+              /users/*/events/*,
+              /events,
+              /events/*,
+              /categories/**,
+              /admin/categories/**,
+              /compilations/**,
+              /admin/compilations/**,
+          order: 3
 
 server:
   port: 8080
+
+logging:
+  level:
+    org.springframework.cloud.gateway: TRACE
+    reactor.netty.http.client: DEBUG
 
 management:
   endpoints:
     web:
       exposure:
-        # "*"
         include: health,info,gateway,metrics,configprops
-  endpoint:
-    gateway:
-      enabled: true
+  gateway:
+    enabled: true

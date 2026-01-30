@@ -1,6 +1,6 @@
 info:
   app:
-    name: delivery
+    name: stats-client
 
 stats:
   server:
