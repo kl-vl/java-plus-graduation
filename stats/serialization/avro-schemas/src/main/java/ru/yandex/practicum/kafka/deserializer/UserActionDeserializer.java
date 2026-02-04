@@ -1,6 +1,6 @@
 package ru.yandex.practicum.kafka.deserializer;
 
-import ru.yandex.practicum.stats.avro.UserActionAvro;
+import ru.yandex.practicum.ewm.stats.avro.UserActionAvro;
 
 public class UserActionDeserializer extends BaseAvroDeserializer<UserActionAvro> {
     public UserActionDeserializer() {

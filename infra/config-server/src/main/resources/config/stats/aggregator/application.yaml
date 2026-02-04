@@ -1,3 +1,23 @@
 info:
   app:
     name: aggregator
+
+kafka:
+  value-serializer: ru.yandex.practicum.kafka.serializer.GeneralAvroSerializer
+  key-serializer: org.apache.kafka.common.serialization.StringSerializer
+  key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  aggregator-deserializer: ru.yandex.practicum.kafka.deserializer.UserActionDeserializer
+  aggregator-group: aggregator-group
+  bootstrap-server: localhost:9092
+  topics:
+    user-action-topic: stats.user-actions.v1
+    similarity-topic: stats.events-similarity.v1
+
+logging:
+  level:
+    ru.yandex.practicum: DEBUG
+    org.springframework.cloud.netflix.eureka: INFO
+    apache.kafka: WARN
+
+management:
+  endpoints.web.exposure.include: health,info

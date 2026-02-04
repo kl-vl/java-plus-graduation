@@ -8,8 +8,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 import ru.yandex.practicum.grpc.collector.UserActionControllerGrpc;
-import ru.yandex.practicum.grpc.user.action.UserAction;
 import ru.yandex.practicum.grpc.user.action.UserActionProto;
+import ru.yandex.practicum.service.UserActionService;
 
 @GrpcService
 @RequiredArgsConstructor

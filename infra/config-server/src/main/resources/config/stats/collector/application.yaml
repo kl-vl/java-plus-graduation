@@ -3,9 +3,11 @@ info:
     name: collector
 
 kafka:
+  value-serializer: ru.yandex.practicum.kafka.serializer.GeneralAvroSerializer
+  key-serializer: org.apache.kafka.common.serialization.StringSerializer
+  bootstrap-server: localhost:9092
   topics:
     user-action-topic: stats.user-actions.v1
-    events-similarity-topic: stats.events-similarity.v1
 
 grpc:
   server:
@@ -20,5 +22,3 @@ logging:
 
 management:
   endpoints.web.exposure.include: health,info
-
-# TODO kafka serializer

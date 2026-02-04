@@ -1,5 +1,5 @@
-namespace ru.yandex.practicum.stats.avro;
-
+namespace ru.yandex.practicum.ewm.stats.avro;
+//TODO @namespace("ru.yandex.practicum.ewm.stats.avro")
 // Optional: main schema (using it creates a .avsc equivalent file)
 schema ActionTypeAvro;
 
