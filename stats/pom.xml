@@ -4,13 +4,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>ru.practicum</groupId>
+        <groupId>ru.yandex.practicum</groupId>
         <artifactId>explore-with-me</artifactId>
-        <version>0.0.3-SNAPSHOT</version>
+        <version>0.0.4-SNAPSHOT</version>
     </parent>
 
     <artifactId>stats</artifactId>
-    <version>0.0.3-SNAPSHOT</version>
+    <version>0.0.4-SNAPSHOT</version>
     <name>stats</name>
     <description>Statistics module</description>
     <packaging>pom</packaging>
@@ -19,6 +19,10 @@
         <module>stats-server</module>
         <module>stats-dto</module>
         <module>stats-client</module>
+        <module>aggregator</module>
+        <module>analyzer</module>
+        <module>collector</module>
+        <module>serialization</module>
     </modules>
 
 </project>

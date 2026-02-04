@@ -3,23 +3,23 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>ru.practicum</groupId>
+        <groupId>ru.yandex.practicum</groupId>
         <artifactId>stats</artifactId>
-        <version>0.0.3-SNAPSHOT</version>
+        <version>0.0.4-SNAPSHOT</version>
     </parent>
 
     <artifactId>stats-server</artifactId>
-    <version>0.0.3-SNAPSHOT</version>
+    <version>0.0.4-SNAPSHOT</version>
     <name>stats-server</name>
     <description>Statistics server</description>
 
     <dependencies>
         <dependency>
-            <groupId>ru.practicum</groupId>
+            <groupId>ru.yandex.practicum</groupId>
             <artifactId>stats-dto</artifactId>
         </dependency>
         <dependency>
-            <groupId>ru.practicum</groupId>
+            <groupId>ru.yandex.practicum</groupId>
             <artifactId>stats-client</artifactId>
         </dependency>
         <dependency>

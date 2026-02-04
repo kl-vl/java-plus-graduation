@@ -1,0 +1,24 @@
+info:
+  app:
+    name: collector
+
+kafka:
+  topics:
+    user-action-topic: stats.user-actions.v1
+    events-similarity-topic: stats.events-similarity.v1
+
+grpc:
+  server:
+    port: 0 #59091
+
+logging:
+  level:
+    ru.yandex.practicum: DEBUG
+    org.springframework.cloud.netflix.eureka: INFO
+    apache.kafka: WARN
+    io.grpc: INFO
+
+management:
+  endpoints.web.exposure.include: health,info
+
+# TODO kafka serializer
