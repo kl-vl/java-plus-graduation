@@ -1,7 +1,8 @@
 package ru.yandex.practicum.model;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -15,28 +16,25 @@ import lombok.Setter;
 import java.time.Instant;
 
 @Entity
-@Table(name = "event_similarity")
+@Table(name = "user_action")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class EventSimilarity {
-
+public class UserAction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
 
-    @Column(name = "event_a", nullable = false)
-    private Long eventA;
+    private Long userId;
 
-    @Column(name = "event_b", nullable = false)
-    private Long eventB;
+    private Long eventId;
 
-    @Column(name = "score", nullable = false)
-    private Double score;
+    @Enumerated(EnumType.STRING)
+    private ActionType actionType;
 
-    @Column(name = "timestamp", nullable = false)
+    private Double actionWeight;
+
     private Instant timestamp;
 }

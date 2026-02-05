@@ -1,6 +1,12 @@
-info:
-  app:
+#info:
+#  app:
+#    name: collector
+spring:
+  application:
     name: collector
+  cloud:
+    discovery:
+      enabled: true
 
 kafka:
   value-serializer: ru.yandex.practicum.kafka.serializer.GeneralAvroSerializer
@@ -11,7 +17,10 @@ kafka:
 
 grpc:
   server:
-    port: 0 #59091
+    port: 0
+
+server:
+  port: 0
 
 logging:
   level:

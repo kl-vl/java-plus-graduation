@@ -1,3 +1,55 @@
 info:
   app:
     name: analyzer
+
+kafka:
+  value-serializer: ru.yandex.practicum.kafka.serializer.GeneralAvroSerializer
+  key-serializer: org.apache.kafka.common.serialization.StringSerializer
+  key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  analyzer-deserializer: ru.yandex.practicum.kafka.deserializer.UserActionDeserializer
+  analyzer-event-similarity-deserializer: ru.yandex.practicum.kafka.deserializer.EventsSimilarityAvroDeserializer
+  analyzer-group-user-action: analyzer-user-action-group
+  analyzer-group-similarity: analyzer-similarity-group
+  bootstrap-server: localhost:9092
+  topics:
+    user-action-topic: stats.user-actions.v1
+    similarity-topic: stats.events-similarity.v1
+
+spring:
+  application:
+    name: analyzer
+  cloud:
+    discovery:
+      enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: none
+    database-platform=org.hibernate.dialect: PostgreSQLDialect
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        entitymanager:
+          factory:
+            interface: jakarta.persistence.EntityManagerFactory
+  sql:
+    init:
+      mode: always
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5433/analyzer_db
+    username: dbuser
+    password: 12345
+
+server:
+  port: 0
+
+logging:
+  level:
+    ru.yandex.practicum: INFO
+    org.springframework.transaction.interceptor: TRACE
+    org.springframework.cloud.netflix.eureka: INFO
+    apache.kafka: WARN
+
+management:
+  endpoints.web.exposure.include: health,info

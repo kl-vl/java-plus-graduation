@@ -1,6 +1,13 @@
-info:
-  app:
+#info:
+#  app:
+#    name: aggregator
+
+spring:
+  application:
     name: aggregator
+  cloud:
+    discovery:
+      enabled: true
 
 kafka:
   value-serializer: ru.yandex.practicum.kafka.serializer.GeneralAvroSerializer
@@ -12,6 +19,9 @@ kafka:
   topics:
     user-action-topic: stats.user-actions.v1
     similarity-topic: stats.events-similarity.v1
+
+server:
+  port: 0
 
 logging:
   level:

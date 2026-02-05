@@ -58,6 +58,8 @@ public class AggregatorService {
             return Collections.emptyList();
         }
 
+        userWeights.put(userId, newWeight);
+
         // Атомарно обновляем сумму весов мероприятия
         double weightDelta = (currentWeight == null) ? newWeight : (newWeight - currentWeight);
         eventWeightSums.compute(eventId, (k, v) -> {
@@ -68,8 +70,8 @@ public class AggregatorService {
         // Обновляем пары мероприятий ТОЛЬКО с теми, где пользователь уже взаимодействовал
         List<EventSimilarityAvro> updatedSimilarities = updateEventPairs(eventId, userId, newWeight, currentWeight);
 
-        // Сохраняем новый максимальный вес пользователя ПОСЛЕ расчета пар
-        userWeights.put(userId, newWeight);
+//        // Сохраняем новый максимальный вес пользователя ПОСЛЕ расчета пар
+//        userWeights.put(userId, newWeight);
 
         return updatedSimilarities;
     }
@@ -147,7 +149,7 @@ public class AggregatorService {
 
         // Отправляем только если значение изменилось значительно (> 0.01)
         double diff = Math.abs(lastSent - newSimilarity);
-        return diff >= EPSILON;
+        return diff > EPSILON;
     }
 
     private Double getLastSentSimilarity(long eventA, long eventB) {

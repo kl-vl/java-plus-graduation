@@ -81,20 +81,20 @@ services:
 #      EUREKA_URI: http://discovery-server:8761/eureka/
 #      PORT: 8080
 
-  stats-db:
-    image: postgres:16.1
-    container_name: postgres-stats-db
-    ports:
-      - "5432:5432"
-    environment:
-      - POSTGRES_DB=stats-db
-      - POSTGRES_USER=dbuser
-      - POSTGRES_PASSWORD=12345
-    healthcheck:
-      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
-      timeout: 5s
-      interval: 5s
-      retries: 10
+#  stats-db:
+#    image: postgres:16.1
+#    container_name: postgres-stats-db
+#    ports:
+#      - "5432:5432"
+#    environment:
+#      - POSTGRES_DB=stats-db
+#      - POSTGRES_USER=dbuser
+#      - POSTGRES_PASSWORD=12345
+#    healthcheck:
+#      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+#      timeout: 5s
+#      interval: 5s
+#      retries: 10
 
   main-db:
     image: postgres:16.1
