@@ -256,7 +256,6 @@ public class EventServiceImpl implements EventService {
         event.setState(EventState.PENDING);
         event.setCreatedOn(LocalDateTime.now());
         event.setConfirmedRequests(0L);
-        event.setRating(0.0);
 
         Event createdEvent = eventRepository.save(event);
 

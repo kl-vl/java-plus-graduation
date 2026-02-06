@@ -1,9 +1,6 @@
 spring:
   application:
     name: discovery-server
-#info:
-#  app:
-#    name: discovery-server
 
 server:
   port: 8761

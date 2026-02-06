@@ -4,8 +4,8 @@ info:
 
 stats:
   server:
-    name: stats-server  # имя сервиса в Eureka
-    url: http://localhost:9090  # fallback url
+    name: stats-server
+    url: http://localhost:9090
     endpoints:
       hit: /hit
       stats: /stats

@@ -77,7 +77,4 @@ public class Event {
     @ManyToMany(mappedBy = "events")
     private Set<Compilation> compilations;
 
-    @Transient
-    private Double rating;
-
 }

@@ -1,6 +1,3 @@
-#info:
-#  app:
-#    name: collector
 spring:
   application:
     name: collector

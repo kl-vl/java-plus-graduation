@@ -1,7 +1,3 @@
-#info:
-#  app:
-#    name: aggregator
-
 spring:
   application:
     name: aggregator

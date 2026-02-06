@@ -27,8 +27,6 @@ spring:
 logging:
   level:
     ru.practicum.stats: INFO
-    #    org.springframework.web: INFO
-    #    org.springframework.validation: INFO
     org.springframework.transaction.interceptor: TRACE
 
 server:

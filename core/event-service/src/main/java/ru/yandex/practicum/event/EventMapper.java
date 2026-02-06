@@ -39,7 +39,6 @@ public interface EventMapper {
     @Mapping(target = "createdOn", ignore = true)
     @Mapping(target = "publishedOn", ignore = true)
     @Mapping(target = "confirmedRequests", ignore = true)
-    @Mapping(target = "rating", ignore = true)
     Event toEvent(EventDto eventDto);
 
     @Mapping(target = "category", ignore = true)
@@ -48,7 +47,6 @@ public interface EventMapper {
     @Mapping(target = "createdOn", ignore = true)
     @Mapping(target = "publishedOn", ignore = true)
     @Mapping(target = "confirmedRequests", ignore = true)
-    @Mapping(target = "rating", ignore = true)
     void updateEventFromDto(EventDto eventDto, @MappingTarget Event event);
 
     @Named("mapCategoryToId")
