@@ -47,22 +47,22 @@ public class AggregatorService {
         Map<Long, Double> userWeights = eventUserWeights.computeIfAbsent(eventId, k -> new ConcurrentHashMap<>());
         Double currentWeight = userWeights.get(userId);
 
-        // Вес не увеличился - ничего не делаем (сохраняем только максимальный вес)
+        // вес не увеличился - ничего не делаем (сохраняем только максимальный вес)
         if (currentWeight != null && newWeight <= currentWeight) {
             return Collections.emptyList();
         }
 
-        // Сначала сохраняем вес пользователя (для корректного поиска пар)
+        // сохраняем вес пользователя
         userWeights.put(userId, newWeight);
 
-        // Атомарно обновляем сумму весов мероприятия
+        // обновляем сумму весов мероприятия
         double weightDelta = (currentWeight == null) ? newWeight : (newWeight - currentWeight);
         eventWeightSums.compute(eventId, (k, v) -> {
             double currentSum = (v == null) ? DEFAULT_WEIGHT : v;
             return currentSum + weightDelta;
         });
 
-        // Обновляем пары мероприятий ТОЛЬКО с теми, где пользователь уже взаимодействовал
+        // обновляем пары мероприятий только с теми, где пользователь уже взаимодействовал
         return updateEventPairs(eventId, userId, newWeight, currentWeight);
     }
 
@@ -70,7 +70,7 @@ public class AggregatorService {
                                                        Double newWeight, Double oldWeight) {
         List<EventSimilarityAvro> updatedSimilarities = new ArrayList<>();
 
-        // Перебираем все другие мероприятия, с которыми взаимодействовал этот пользователь
+        // ищем другие мероприятия, с которыми взаимодействовал этот пользователь
         for (Map.Entry<Long, Map<Long, Double>> entry : eventUserWeights.entrySet()) {
             Long otherEventId = entry.getKey();
             if (updatedEventId.equals(otherEventId)) {
@@ -80,19 +80,18 @@ public class AggregatorService {
             Map<Long, Double> otherUserWeights = entry.getValue();
             Double otherWeight = otherUserWeights.get(userId);
             if (otherWeight == null) {
-                continue; // Пользователь не взаимодействовал с другим мероприятием
+                continue;
             }
 
-            // Определяем упорядоченную пару (меньший ID первым)
+            // определяем упорядоченную пару мероприятий (меньший ID первым)
             long eventA = Math.min(updatedEventId, otherEventId);
             long eventB = Math.max(updatedEventId, otherEventId);
 
-            // Рассчитываем изменение суммы минимумов
             double oldMin = (oldWeight != null) ? Math.min(oldWeight, otherWeight) : DEFAULT_WEIGHT;
             double newMin = Math.min(newWeight, otherWeight);
             double minDelta = newMin - oldMin;
 
-            // Атомарно обновляем сумму минимальных весов для пары
+            // обновляем сумму минимальных весов для пары
             eventPairMinSums.compute(eventA, (k, innerMap) -> {
                 if (innerMap == null) {
                     innerMap = new ConcurrentHashMap<>();
@@ -102,19 +101,17 @@ public class AggregatorService {
                     double newSum = currentSum + minDelta;
 
                     if (newSum <= EPSILON) {
-                        return null; // Удаляем запись если сумма близка к нулю
+                        return null;
                     }
                     return newSum;
                 });
 
-                // Удаляем пустую внутреннюю карту
                 if (innerMap.isEmpty()) {
                     return null;
                 }
                 return innerMap;
             });
 
-            // ВСЕГДА отправляем событие при обновлении пары (без кэша!)
             EventSimilarityAvro similarity = calculateSimilarity(eventA, eventB);
             if (similarity != null) {
                 updatedSimilarities.add(similarity);
@@ -128,12 +125,12 @@ public class AggregatorService {
         Double sumA = eventWeightSums.get(eventA);
         Double sumB = eventWeightSums.get(eventB);
 
-        // Проверяем, что у обоих мероприятий есть взаимодействия
+        // у обоих мероприятий есть взаимодействия
         if (sumA == null || sumB == null || sumA <= EPSILON || sumB <= EPSILON) {
             return null;
         }
 
-        // Получаем сумму минимальных весов для пары
+        // сумма минимальных весов для пары
         Double minSum = eventPairMinSums
                 .getOrDefault(eventA, Collections.emptyMap())
                 .get(eventB);
@@ -142,12 +139,12 @@ public class AggregatorService {
             return null;
         }
 
-        // Формула схожести: Σ min(w₁, w₂) / (√Σw₁ × √Σw₂)
+        // формула схожести
         double normA = Math.sqrt(sumA);
         double normB = Math.sqrt(sumB);
         double similarity = minSum / (normA * normB);
 
-        // Ограничиваем значение в диапазоне [0, 1] и округляем до 2 знаков
+        // ограничение значения в диапазоне [0, 1]
         similarity = Math.max(DEFAULT_WEIGHT, Math.min(MAX_WEIGHT, similarity));
         similarity = round(similarity);
 

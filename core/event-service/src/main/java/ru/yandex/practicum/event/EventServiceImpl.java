@@ -108,16 +108,6 @@ public class EventServiceImpl implements EventService {
                 .collect(Collectors.toList());
     }
 
-//    private void addHit(HttpServletRequest request) {
-//        EndpointHitDto endpointHitDto = EndpointHitDto.builder()
-//                .app("main-service")
-//                .uri(request.getRequestURI())
-//                .ip(request.getRemoteAddr())
-//                .timestamp(LocalDateTime.now())
-//                .build();
-//        clientRestStat.addStat(endpointHitDto);
-//    }
-
     private void enrichEventsWithConfirmedRequests(List<EventDtoFull> events) {
         if (events.isEmpty()) {
             return;
@@ -154,20 +144,6 @@ public class EventServiceImpl implements EventService {
 
         LocalDateTime start = eventFilter.getRangeStart() != null ? eventFilter.getRangeStart() : LocalDateTime.now().minusDays(1);
         LocalDateTime end = eventFilter.getRangeEnd() != null ? eventFilter.getRangeEnd() : LocalDateTime.now().plusDays(1);
-
-//        List<ViewStatsDto> stats = clientRestStat.getStat(start, end, uris, true);
-//
-//        Map<String, Long> viewsByUri = stats.stream()
-//                .collect(Collectors.toMap(
-//                        ViewStatsDto::getUri,
-//                        ViewStatsDto::getHits
-//                ));
-//
-//        events.forEach(event -> {
-//            String eventUri = "/events/" + event.getId();
-//            Long views = viewsByUri.getOrDefault(eventUri, 0L);
-//            event.setViews(views);
-//        });
     }
 
     // Admin
@@ -280,7 +256,6 @@ public class EventServiceImpl implements EventService {
         event.setState(EventState.PENDING);
         event.setCreatedOn(LocalDateTime.now());
         event.setConfirmedRequests(0L);
-        // TODO
         event.setRating(0.0);
 
         Event createdEvent = eventRepository.save(event);
@@ -357,10 +332,6 @@ public class EventServiceImpl implements EventService {
 
         log.info("Event-service. findEventsByUsers input: filter = {}", eventFilter);
 
-        // TODO теперь не нужно отправлять информацию о просмотре.
-        //  вызов stat-client
-        //addHit(request);
-
         Specification<Event> specification = EventSpecifications.forPublicFilter(eventFilter);
         Pageable pageable = PageRequest.of(eventFilter.getFrom() / eventFilter.getSize(), eventFilter.getSize());
         Page<Event> pageEvents = eventRepository.findAll(specification, pageable);
@@ -375,17 +346,12 @@ public class EventServiceImpl implements EventService {
     public EventDtoFull findEventById(Long eventId, HttpServletRequest request) throws EventNotFoundException {
         log.info("Event-service. findEventById input: eventId = {}", eventId);
 
-        // TODO теперь не нужно отправлять информацию о просмотре.
-        // вызов stat-client
-        //addHit(request);
-
         Event event = eventRepository.findByIdAndState(eventId, EventState.PUBLISHED).orElseThrow(() -> new EventNotFoundException("Event with id " + eventId + " not found"));
 
         log.info("Event-service. findEventById success: eventId = {}", event.getId());
 
         EventDtoFull eventDto = eventMapper.toEventFullDto(event);
 
-        // добавляем views из статистики
         enrichEventWithAdditionalData(eventDto);
 
         return eventDto;
@@ -452,12 +418,6 @@ public class EventServiceImpl implements EventService {
         log.info("Event-service. enrichEvent: eventId = {}, confirmedRequests = {} ", event.getId(), confirmedRequests);
         event.setConfirmedRequests(confirmedRequests);
 
-        // views
-//        String uri = "/events/" + event.getId();
-//        List<ViewStatsDto> stats = clientRestStat.getStat(event.getCreatedOn().minusMinutes(1), LocalDateTime.now().plusMinutes(1), List.of(uri), true);
-//        Long views = stats.isEmpty() ? 0L : stats.getFirst().getHits();
-//        log.info("Event-service. enrichEvent: eventId = {}, hits = {} ", event.getId(), views);
-//        event.setViews(views);
     }
 
     @Override
@@ -470,7 +430,6 @@ public class EventServiceImpl implements EventService {
 
         EventDtoFull eventDto = eventMapper.toEventFullDto(event);
 
-        // добавляем views из статистики
         enrichEventWithAdditionalData(eventDto);
 
         return eventDto;

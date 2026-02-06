@@ -81,7 +81,6 @@ public class AggregatorKafkaConfig {
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
         props.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, 0);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-        // TODO настройки
         props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 100);
         props.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, 1);
         props.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, 500);
@@ -103,10 +102,10 @@ public class AggregatorKafkaConfig {
 
         DefaultErrorHandler errorHandler = new DefaultErrorHandler(
                 (record, exception) -> {
-                    log.error("Failed to process message from topic {}: {}",
+                    log.error("AggregatorKafkaConfig. Failed to process message from topic {}: {}",
                             record.topic(), exception.getMessage());
                 },
-                new FixedBackOff(1000L, 2) // TODO 2 попытки с интервалом 1 секунда
+                new FixedBackOff(1000L, 2)
         );
         factory.setCommonErrorHandler(errorHandler);
 

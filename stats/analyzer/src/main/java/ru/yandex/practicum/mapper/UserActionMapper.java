@@ -22,17 +22,6 @@ public interface UserActionMapper {
         return ActionType.valueOf(actionType.name());
     }
 
-    /*default Double calculateActionWeight(ActionTypeAvro actionType) {
-        if (actionType == null) {
-            return 0.0;
-        }
-
-        return switch (actionType) {
-            case VIEW -> 0.4;
-            case REGISTER -> 0.8;
-            case LIKE -> 1.0;
-        };
-    }*/
     default Double calculateActionWeight(ActionTypeAvro actionType) {
         ActionType domainType = ActionType.fromAvro(actionType);
         return ActionType.getWeightOrDefault(domainType, 0.0);

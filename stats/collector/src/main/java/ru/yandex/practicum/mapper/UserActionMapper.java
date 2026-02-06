@@ -10,15 +10,11 @@ import ru.yandex.practicum.ewm.stats.avro.UserActionAvro;
 import java.time.Instant;
 
 @Mapper(componentModel = "spring")
-//@Mapper
 public interface UserActionMapper {
 
-    //TODO @Mapping(source = "actionType", target = "actionType")
-    //@Mapping(source = "timestamp", target = "timestamp")
     UserActionAvro mapToAvro(UserActionProto action);
     default ActionTypeAvro mapActionType(ActionTypeProto actionType) {
         if (actionType == null) {
-            // TODO return null;
             throw new IllegalArgumentException("UserActionProto cannot be null.");
         }
         return switch (actionType) {

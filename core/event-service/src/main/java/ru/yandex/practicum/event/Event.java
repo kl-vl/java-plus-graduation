@@ -74,10 +74,6 @@ public class Event {
 
     private String title;
 
-    // Не хранится в бд, получается через клиента из сервера статистики
-//    @Transient
-//    private Long views;
-
     @ManyToMany(mappedBy = "events")
     private Set<Compilation> compilations;
 

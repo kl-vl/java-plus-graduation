@@ -29,7 +29,7 @@ public class UserActionListener {
             @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset) {
 
-        log.debug("Получено сообщение: topic={}, partition={}, offset={}, userId={}, actionType={}",
+        log.debug("UserActionListener. Receive message: topic={}, partition={}, offset={}, userId={}, actionType={}",
                 topic, partition, offset,
                 message.getUserId(), message.getActionType());
 
@@ -38,11 +38,11 @@ public class UserActionListener {
 
             acknowledgment.acknowledge();
 
-            log.debug("Сообщение подтверждено: topic={}, partition={}, offset={}",
+            log.debug("UserActionListener. Message confirmed: topic={}, partition={}, offset={}",
                     topic, partition, offset);
 
         } catch (Exception e) {
-            log.error("Ошибка обработки сообщения [topic={}, partition={}, offset={}]: {}",
+            log.error("UserActionListener. Message process error: topic={}, partition={}, offset={}: {}",
                     topic, partition, offset, e.getMessage(), e);
 
         }
