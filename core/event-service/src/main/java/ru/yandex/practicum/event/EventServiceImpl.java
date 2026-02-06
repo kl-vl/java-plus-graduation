@@ -14,16 +14,16 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
-import ru.practicum.stats.ClientRestStat;
-import ru.practicum.stats.EndpointHitDto;
-import ru.practicum.stats.ViewStatsDto;
 import ru.yandex.practicum.category.Category;
 import ru.yandex.practicum.category.CategoryRepository;
+import ru.yandex.practicum.client.AnalyzerClient;
+import ru.yandex.practicum.client.CollectorClient;
 import ru.yandex.practicum.client.service.RequestServiceClient;
 import ru.yandex.practicum.client.service.UserServiceClient;
 import ru.yandex.practicum.dto.BooleanResponseDto;
 import ru.yandex.practicum.dto.event.EventDto;
 import ru.yandex.practicum.dto.event.EventDtoFull;
+import ru.yandex.practicum.dto.event.EventDtoShort;
 import ru.yandex.practicum.dto.event.EventFilterAdmin;
 import ru.yandex.practicum.dto.event.EventFilterBase;
 import ru.yandex.practicum.dto.event.EventFilterPublic;
@@ -40,10 +40,14 @@ import ru.yandex.practicum.exception.EventNotFoundException;
 import ru.yandex.practicum.exception.FilterValidationException;
 import ru.yandex.practicum.exception.ServiceException;
 import ru.yandex.practicum.exception.UserNotFoundException;
+import ru.yandex.practicum.grpc.similarity.reports.RecommendedEventProto;
+import ru.yandex.practicum.grpc.user.action.ActionTypeProto;
 import ru.yandex.practicum.location.Location;
 import ru.yandex.practicum.location.LocationRepository;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -55,13 +59,14 @@ import java.util.stream.Collectors;
 public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;
-    private final ClientRestStat clientRestStat;
     private final EventMapper eventMapper;
     private final Validator validator;
     private final CategoryRepository categoryRepository;
     private final LocationRepository locationRepository;
     private final UserServiceClient userServiceClient;
     private final RequestServiceClient requestServiceClient;
+    private final CollectorClient collectorClient;
+    private final AnalyzerClient analyzerClient;
 
     private void validateFilter(EventFilterBase filter) throws FilterValidationException, EventDateException {
 
@@ -103,15 +108,15 @@ public class EventServiceImpl implements EventService {
                 .collect(Collectors.toList());
     }
 
-    private void addHit(HttpServletRequest request) {
-        EndpointHitDto endpointHitDto = EndpointHitDto.builder()
-                .app("main-service")
-                .uri(request.getRequestURI())
-                .ip(request.getRemoteAddr())
-                .timestamp(LocalDateTime.now())
-                .build();
-        clientRestStat.addStat(endpointHitDto);
-    }
+//    private void addHit(HttpServletRequest request) {
+//        EndpointHitDto endpointHitDto = EndpointHitDto.builder()
+//                .app("main-service")
+//                .uri(request.getRequestURI())
+//                .ip(request.getRemoteAddr())
+//                .timestamp(LocalDateTime.now())
+//                .build();
+//        clientRestStat.addStat(endpointHitDto);
+//    }
 
     private void enrichEventsWithConfirmedRequests(List<EventDtoFull> events) {
         if (events.isEmpty()) {
@@ -150,19 +155,19 @@ public class EventServiceImpl implements EventService {
         LocalDateTime start = eventFilter.getRangeStart() != null ? eventFilter.getRangeStart() : LocalDateTime.now().minusDays(1);
         LocalDateTime end = eventFilter.getRangeEnd() != null ? eventFilter.getRangeEnd() : LocalDateTime.now().plusDays(1);
 
-        List<ViewStatsDto> stats = clientRestStat.getStat(start, end, uris, true);
-
-        Map<String, Long> viewsByUri = stats.stream()
-                .collect(Collectors.toMap(
-                        ViewStatsDto::getUri,
-                        ViewStatsDto::getHits
-                ));
-
-        events.forEach(event -> {
-            String eventUri = "/events/" + event.getId();
-            Long views = viewsByUri.getOrDefault(eventUri, 0L);
-            event.setViews(views);
-        });
+//        List<ViewStatsDto> stats = clientRestStat.getStat(start, end, uris, true);
+//
+//        Map<String, Long> viewsByUri = stats.stream()
+//                .collect(Collectors.toMap(
+//                        ViewStatsDto::getUri,
+//                        ViewStatsDto::getHits
+//                ));
+//
+//        events.forEach(event -> {
+//            String eventUri = "/events/" + event.getId();
+//            Long views = viewsByUri.getOrDefault(eventUri, 0L);
+//            event.setViews(views);
+//        });
     }
 
     // Admin
@@ -170,7 +175,7 @@ public class EventServiceImpl implements EventService {
     public List<EventDtoFull> findEventsByUsers(EventFilterAdmin eventFilter) throws FilterValidationException, EventDateException {
         validateFilter(eventFilter);
 
-        log.info("Main-service. findEventsByUsers input: filter = {}", eventFilter);
+        log.info("Event-service. findEventsByUsers input: filter = {}", eventFilter);
 
         Specification<Event> specification = EventSpecifications.forAdminFilter(eventFilter);
 
@@ -182,7 +187,7 @@ public class EventServiceImpl implements EventService {
         enrichEventsWithConfirmedRequests(events);
         enrichEventsWithViews(events, eventFilter);
 
-        log.info("Main-service. findEventsByUsers success: size = {}", events.size());
+        log.info("Event-service. findEventsByUsers success: size = {}", events.size());
 
         return events;
     }
@@ -190,7 +195,7 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public EventDtoFull updateEventById(EventDto eventDto) throws EventNotFoundException, EventDateException, EventAlreadyPublishedException, EventCanceledCantPublishException {
-        log.info("Main-service. updateEventById input: id = {}", eventDto.getId());
+        log.info("Event-service. updateEventById input: id = {}", eventDto.getId());
         Event event = eventRepository.findById(eventDto.getId())
                 .orElseThrow(() -> new EventNotFoundException("Event with id=%d was not found".formatted(eventDto.getId())));
 
@@ -228,7 +233,7 @@ public class EventServiceImpl implements EventService {
         eventMapper.updateEventFromDto(eventDto, event);
         Event updatedEvent = eventRepository.save(event);
 
-        log.info("Main-service. updateEventById success: id = {}", updatedEvent.getId());
+        log.info("Event-service. updateEventById success: id = {}", updatedEvent.getId());
 
         return eventMapper.toEventFullDto(updatedEvent);
     }
@@ -238,7 +243,7 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public EventDtoFull createEvent(EventDto eventDto) throws
             CategoryNotFoundException, EventDateException, UserNotFoundException, ServiceException {
-        log.info("Main-service. createEvent input: id = {}", eventDto.getDescription());
+        log.info("Event-service. createEvent input: id = {}", eventDto.getDescription());
 
         setDefaultValues(eventDto);
 
@@ -275,36 +280,37 @@ public class EventServiceImpl implements EventService {
         event.setState(EventState.PENDING);
         event.setCreatedOn(LocalDateTime.now());
         event.setConfirmedRequests(0L);
-        event.setViews(0L);
+        // TODO
+        event.setRating(0.0);
 
         Event createdEvent = eventRepository.save(event);
 
-        log.info("Main-service. createEvent success: id = {}", createdEvent.getId());
+        log.info("Event-service. createEvent success: id = {}", createdEvent.getId());
 
         return eventMapper.toEventFullDto(createdEvent);
     }
 
     @Override
     public EventDtoFull findEventByUserId(Long userId, Long eventId) throws EventNotFoundException {
-        log.info("Main-service. findEventByUserId input: userId = {}, eventId = {}", userId, eventId);
+        log.info("Event-service. findEventByUserId input: userId = {}, eventId = {}", userId, eventId);
 
         Event event = eventRepository.findByIdAndInitiatorId(eventId, userId).orElseThrow(() -> new EventNotFoundException("Event with id " + eventId + " not found"));
 
-        log.info("Main-service. findEventByUserId success: id = {}", event.getId());
+        log.info("Event-service. findEventByUserId success: id = {}", event.getId());
 
         return eventMapper.toEventFullDto(event);
     }
 
     @Override
     public List<EventDtoFull> findEventsByUserid(Long userId, int from, int size) {
-        log.info("Main-service. findEventsByUserid input: userId = {}, from = {}, size = {}", userId, from, size);
+        log.info("Event-service. findEventsByUserid input: userId = {}, from = {}, size = {}", userId, from, size);
 
         Pageable pageable = PageRequest.of(from / size, size);
 
         Page<Event> pageEvents = eventRepository.findAllByInitiatorId(userId, pageable);
         final List<EventDtoFull> events = getDtoFullList(pageEvents);
 
-        log.info("Main-service. findEventsByUserid success: id = {}", events.size());
+        log.info("Event-service. findEventsByUserid success: id = {}", events.size());
 
         return events;
     }
@@ -314,7 +320,7 @@ public class EventServiceImpl implements EventService {
     public EventDtoFull updateEventByUserId(EventDto eventDto) throws EventNotFoundException, EventDateException, EventCanceledCantPublishException {
         // изменить можно только отмененные события или события в состоянии ожидания модерации (Ожидается код ошибки 409)
         //дата и время на которые намечено событие не может быть раньше, чем через два часа от текущего момента (Ожидается код ошибки 409)
-        log.info("Main-service. updateEventByUserId input: eventId = {}, userId = {}", eventDto.getId(), eventDto.getInitiator());
+        log.info("Event-service. updateEventByUserId input: eventId = {}, userId = {}", eventDto.getId(), eventDto.getInitiator());
 
         if (eventDto.getEventDate() != null && !eventDto.getEventDate().isAfter(LocalDateTime.now().plusHours(2))) {
             throw new EventDateException("Event date should be in 2+ hours after now");
@@ -338,7 +344,7 @@ public class EventServiceImpl implements EventService {
         }
         Event updatedEvent = eventRepository.save(existingEvent);
 
-        log.info("Main-service. updateEventByUserId success: eventId = {}", updatedEvent.getId());
+        log.info("Event-service. updateEventByUserId success: eventId = {}", updatedEvent.getId());
 
         return eventMapper.toEventFullDto(updatedEvent);
     }
@@ -349,31 +355,33 @@ public class EventServiceImpl implements EventService {
             FilterValidationException, EventDateException {
         validateFilter(eventFilter);
 
-        log.info("Main-service. findEventsByUsers input: filter = {}", eventFilter);
+        log.info("Event-service. findEventsByUsers input: filter = {}", eventFilter);
 
-        // вызов stat-client
-        addHit(request);
+        // TODO теперь не нужно отправлять информацию о просмотре.
+        //  вызов stat-client
+        //addHit(request);
 
         Specification<Event> specification = EventSpecifications.forPublicFilter(eventFilter);
         Pageable pageable = PageRequest.of(eventFilter.getFrom() / eventFilter.getSize(), eventFilter.getSize());
         Page<Event> pageEvents = eventRepository.findAll(specification, pageable);
         final List<EventDtoFull> events = getDtoFullList(pageEvents);
 
-        log.info("Main-service. findEventsByUsers success: size = {}", events.size());
+        log.info("Event-service. findEventsByUsers success: size = {}", events.size());
 
         return events;
     }
 
     @Override
     public EventDtoFull findEventById(Long eventId, HttpServletRequest request) throws EventNotFoundException {
-        log.info("Main-service. findEventById input: eventId = {}", eventId);
+        log.info("Event-service. findEventById input: eventId = {}", eventId);
 
+        // TODO теперь не нужно отправлять информацию о просмотре.
         // вызов stat-client
-        addHit(request);
+        //addHit(request);
 
         Event event = eventRepository.findByIdAndState(eventId, EventState.PUBLISHED).orElseThrow(() -> new EventNotFoundException("Event with id " + eventId + " not found"));
 
-        log.info("Main-service. findEventById success: eventId = {}", event.getId());
+        log.info("Event-service. findEventById success: eventId = {}", event.getId());
 
         EventDtoFull eventDto = eventMapper.toEventFullDto(event);
 
@@ -383,26 +391,82 @@ public class EventServiceImpl implements EventService {
         return eventDto;
     }
 
+    @Override
+    public EventDtoFull findEventById(Long eventId, Long userId) throws EventNotFoundException {
+        log.info("Event-service. findEventById input: eventId = {}, userId = {}", eventId, userId);
+
+        Event event = eventRepository.findByIdAndState(eventId, EventState.PUBLISHED).orElseThrow(() -> new EventNotFoundException("Event with id " + eventId + " not found"));
+
+        // при обработке запроса к эндпоинту GET /events/{id} необходимо отправить информацию о просмотре пользователем мероприятия с идентификатором id
+        collectorClient.collectUserAction(userId, eventId, ActionTypeProto.ACTION_VIEW.toString(), Instant.now());
+
+        log.info("Event-service. findEventById success: eventId = {}", event.getId());
+
+        return eventMapper.toEventFullDto(event);
+    }
+
+
+    @Override
+    public List<EventDtoShort> getRecommendations(Long max, Long userId) {
+        log.info("Event-service. getRecommendations input: max = {}, userId = {}", max, userId);
+
+        Map<Long, Double> recommendations = analyzerClient.getRecommendationsForUser(userId, max)
+                .collect(Collectors.toMap(RecommendedEventProto::getEventId, RecommendedEventProto::getScore));
+
+        if (recommendations.isEmpty()) {
+            log.info("Event-service. getRecommendations: No recommendations for userId={}", userId);
+            return List.of();
+        }
+
+        List<EventDtoShort> result = eventRepository.findAllById(recommendations.keySet()).stream()
+                .filter(event -> event.getState() == EventState.PUBLISHED)
+                .map(event -> {
+                    EventDtoShort dto = eventMapper.toEventDtoShort(event);
+                    dto.setRating(recommendations.get(event.getId()));
+                    return dto;
+                })
+                .sorted(Comparator.comparingDouble(EventDtoShort::getRating).reversed())
+                .limit(max)
+                .toList();
+
+        log.info("Event-service. getRecommendations: {} recommendations for userId={}", result.size(), userId);
+        return result;
+    }
+
+    @Override
+    public void addLike(Long eventId, Long userId) throws EventNotFoundException, ServiceException, UserNotFoundException {
+        log.info("Event-service. addLike input: eventId = {}, userId = {}", eventId, userId);
+
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
+
+        if (requestServiceClient.checkUserParticipation(userId, eventId)) {
+            collectorClient.collectUserAction(userId, eventId, ActionTypeProto.ACTION_LIKE.toString(), Instant.now());
+        } else {
+            throw new UserNotFoundException("The user %s did not register for event %s".formatted(userId, eventId));
+        }
+
+    }
+
     private void enrichEventWithAdditionalData(EventDtoFull event) {
         Long confirmedRequests = requestServiceClient.getConfirmedRequestCount(event.getId());
-        log.info("Main-service. enrichEvent: eventId = {}, confirmedRequests = {} ", event.getId(), confirmedRequests);
+        log.info("Event-service. enrichEvent: eventId = {}, confirmedRequests = {} ", event.getId(), confirmedRequests);
         event.setConfirmedRequests(confirmedRequests);
 
         // views
-        String uri = "/events/" + event.getId();
-        List<ViewStatsDto> stats = clientRestStat.getStat(event.getCreatedOn().minusMinutes(1), LocalDateTime.now().plusMinutes(1), List.of(uri), true);
-        Long views = stats.isEmpty() ? 0L : stats.getFirst().getHits();
-        log.info("Main-service. enrichEvent: eventId = {}, hits = {} ", event.getId(), views);
-        event.setViews(views);
+//        String uri = "/events/" + event.getId();
+//        List<ViewStatsDto> stats = clientRestStat.getStat(event.getCreatedOn().minusMinutes(1), LocalDateTime.now().plusMinutes(1), List.of(uri), true);
+//        Long views = stats.isEmpty() ? 0L : stats.getFirst().getHits();
+//        log.info("Event-service. enrichEvent: eventId = {}, hits = {} ", event.getId(), views);
+//        event.setViews(views);
     }
 
     @Override
     public EventDtoFull findEventById(Long eventId) throws EventNotFoundException {
-        log.info("Main-service. findEventById input: eventId = {}", eventId);
+        log.info("Event-service. findEventById input: eventId = {}", eventId);
 
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException("Event with id " + eventId + " not found"));
 
-        log.info("Main-service. findEventById success: eventId = {}", event.getId());
+        log.info("Event-service. findEventById success: eventId = {}", event.getId());
 
         EventDtoFull eventDto = eventMapper.toEventFullDto(event);
 
@@ -414,11 +478,11 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public BooleanResponseDto existsEvent(Long eventId) {
-        log.info("Main-service. existsEvent input: eventId = {}", eventId);
+        log.info("Event-service. existsEvent input: eventId = {}", eventId);
 
         boolean exists = eventRepository.existsById(eventId);
 
-        log.info("{}. existsUser success: userId = {} {}", "Event-service", eventId, exists? "exists" : "does not exist");
+        log.info("{}. existsUser success: userId = {} {}", "Event-service", eventId, exists ? "exists" : "does not exist");
 
         return new BooleanResponseDto(exists);
     }

@@ -63,6 +63,8 @@ public class EventDto {
     @Size(min = 3, max = 120)
     private String title;
 
-    private Long views;
+    //private Long views;
+    private Double rating;
+
 
 }
