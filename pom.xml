@@ -12,9 +12,9 @@
 
     <name>Explore With Me</name>
 
-    <groupId>ru.practicum</groupId>
+    <groupId>ru.yandex.practicum</groupId>
     <artifactId>explore-with-me</artifactId>
-    <version>0.0.3-SNAPSHOT</version>
+    <version>0.0.4-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <properties>
@@ -32,6 +32,14 @@
         <spring-boot-starter-validation.version>3.5.8</spring-boot-starter-validation.version>
         <spring-cloud-dependencies.version>2025.0.1</spring-cloud-dependencies.version>
         <caffeine.version>3.2.3</caffeine.version>
+        <avro.version>1.12.1</avro.version>
+        <avro-maven-plugin.version>${avro.version}</avro-maven-plugin.version>
+        <protobuf.version>3.25.4</protobuf.version>
+        <protobuf-plugin.version>4.0.2</protobuf-plugin.version>
+        <grpc.version>1.77.0</grpc.version>
+        <grpc-spring-boot-starter.version>3.1.0.RELEASE</grpc-spring-boot-starter.version>
+        <kafka-clients.version>4.1.1</kafka-clients.version>
+        <skip.protobuf.generation>false</skip.protobuf.generation>
     </properties>
 
     <modules>
@@ -44,13 +52,13 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>ru.practicum</groupId>
+                <groupId>ru.yandex.practicum</groupId>
                 <artifactId>stats-dto</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>ru.practicum</groupId>
+                <groupId>ru.yandex.practicum</groupId>
                 <artifactId>stats-client</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -118,6 +126,56 @@
                 <groupId>com.github.ben-manes.caffeine</groupId>
                 <artifactId>caffeine</artifactId>
                 <version>${caffeine.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.avro</groupId>
+                <artifactId>avro</artifactId>
+                <version>${avro.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-bom</artifactId>
+                <version>${grpc.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>net.devh</groupId>
+                <artifactId>grpc-spring-boot-starter</artifactId>
+                <version>${grpc-spring-boot-starter.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.devh</groupId>
+                <artifactId>grpc-server-spring-boot-starter</artifactId>
+                <version>${grpc-spring-boot-starter.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.devh</groupId>
+                <artifactId>grpc-client-spring-boot-starter</artifactId>
+                <version>${grpc-spring-boot-starter.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-stub</artifactId>
+                <version>${grpc.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-protobuf</artifactId>
+                <version>${grpc.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka-clients</artifactId>
+                <version>${kafka-clients.version}</version>
             </dependency>
 
         </dependencies>
@@ -245,6 +303,16 @@
                             </goals>
                         </execution>
                     </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.avro</groupId>
+                    <artifactId>avro-maven-plugin</artifactId>
+                    <version>${avro-maven-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>io.github.ascopes</groupId>
+                    <artifactId>protobuf-maven-plugin</artifactId>
+                    <version>${protobuf-plugin.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>

@@ -9,6 +9,7 @@ import ru.yandex.practicum.dto.category.CategoryDto;
 import ru.yandex.practicum.config.CommonMapperConfiguration;
 import ru.yandex.practicum.dto.event.EventDto;
 import ru.yandex.practicum.dto.event.EventDtoFull;
+import ru.yandex.practicum.dto.event.EventDtoShort;
 import ru.yandex.practicum.location.Location;
 import ru.yandex.practicum.dto.location.LocationDto;
 
@@ -19,8 +20,12 @@ public interface EventMapper {
     @Mapping(target = "category", source = "category", qualifiedByName = "mapCategoryToId")
     @Mapping(target = "initiator", source = "initiatorId")
     @Mapping(target = "location", source = "location", qualifiedByName = "mapLocationToDto")
-    @Mapping(target = "views", ignore = true)
+    @Mapping(target = "rating", ignore = true)
     EventDto toEventDto(Event event);
+
+    @Mapping(target = "category", source = "category", qualifiedByName = "mapCategoryToDto")
+    @Mapping(target = "initiator", source = "initiatorId")
+    EventDtoShort toEventDtoShort(Event event);
 
     // EventDtoFull - DTO
     @Mapping(target = "category", source = "category", qualifiedByName = "mapCategoryToDto")
@@ -34,7 +39,6 @@ public interface EventMapper {
     @Mapping(target = "createdOn", ignore = true)
     @Mapping(target = "publishedOn", ignore = true)
     @Mapping(target = "confirmedRequests", ignore = true)
-    @Mapping(target = "views", ignore = true)
     Event toEvent(EventDto eventDto);
 
     @Mapping(target = "category", ignore = true)
@@ -43,7 +47,6 @@ public interface EventMapper {
     @Mapping(target = "createdOn", ignore = true)
     @Mapping(target = "publishedOn", ignore = true)
     @Mapping(target = "confirmedRequests", ignore = true)
-    @Mapping(target = "views", ignore = true)
     void updateEventFromDto(EventDto eventDto, @MappingTarget Event event);
 
     @Named("mapCategoryToId")

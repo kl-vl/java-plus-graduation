@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -73,9 +74,7 @@ public class Event {
 
     private String title;
 
-    // Не хранится в бд, получается через клиента из сервера статистики
-    private Long views;
-
     @ManyToMany(mappedBy = "events")
     private Set<Compilation> compilations;
+
 }

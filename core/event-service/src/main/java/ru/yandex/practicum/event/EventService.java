@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import ru.yandex.practicum.dto.BooleanResponseDto;
 import ru.yandex.practicum.dto.event.EventDto;
 import ru.yandex.practicum.dto.event.EventDtoFull;
+import ru.yandex.practicum.dto.event.EventDtoShort;
 import ru.yandex.practicum.dto.event.EventFilterAdmin;
 import ru.yandex.practicum.dto.event.EventFilterPublic;
 import ru.yandex.practicum.exception.CategoryNotFoundException;
@@ -37,6 +38,12 @@ public interface EventService {
     List<EventDtoFull> findEvents(EventFilterPublic eventFilter, HttpServletRequest request) throws FilterValidationException, EventDateException;
 
     EventDtoFull findEventById(Long eventId, HttpServletRequest request) throws EventNotFoundException;
+
+    EventDtoFull findEventById(Long eventId, Long userId) throws EventNotFoundException;
+
+    List<EventDtoShort> getRecommendations(Long max, Long userId);
+
+    void addLike(Long eventId, Long userId) throws EventNotFoundException, ServiceException, UserNotFoundException;
 
     // Internal
     EventDtoFull findEventById(Long eventId) throws EventNotFoundException;

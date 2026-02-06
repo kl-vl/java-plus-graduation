@@ -5,7 +5,7 @@ public class EventNotFoundException extends Exception {
         super(message);
     }
 
-    public EventNotFoundException(Long userId) {
-        super("Event not found: " + userId);
+    public EventNotFoundException(Long eventId) {
+        super("Event not found: " + eventId);
     }
 }

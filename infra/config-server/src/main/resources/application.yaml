@@ -13,7 +13,7 @@ spring:
             - classpath:config/stats/{application}
 
 server:
-  port: 0 #8888
+  port: 0
   shutdown: graceful
 
 eureka:
@@ -25,7 +25,6 @@ eureka:
     preferIpAddress: false
     hostname: localhost
     instance-id: "${spring.application.name}:${random.value}"
-    #leaseRenewalIntervalInSeconds: 30
 
 management:
   endpoints.web.exposure.include: health,info,metrics

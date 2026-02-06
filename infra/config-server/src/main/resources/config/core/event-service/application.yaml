@@ -29,27 +29,23 @@ spring:
 logging:
   level:
     ru.practicum.stats: INFO
-    #    org.springframework.web: INFO
-    #    org.springframework.validation: INFO
     org.springframework.transaction.interceptor: TRACE
 
 server:
   port: 0
 
-eureka:
+grpc:
   client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
-    fetch-registry: true
-    register-with-eureka: true
-    enabled: true
-  instance:
-    prefer-ip-address: true
-    hostname: localhost
-
-stats:
-  server:
-    service-name: stats-server
+    collector:
+      address: 'discovery:///collector'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+    analyzer:
+      address: 'discovery:///analyzer'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
 
 management:
   endpoints.web.exposure.include: health,info

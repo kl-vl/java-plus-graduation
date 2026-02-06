@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.practicum.client.CollectorClient;
 import ru.yandex.practicum.client.service.EventServiceClient;
 import ru.yandex.practicum.client.service.UserServiceClient;
 import ru.yandex.practicum.dto.BooleanResponseDto;
@@ -26,10 +27,12 @@ import ru.yandex.practicum.exception.RequestNotFoundException;
 import ru.yandex.practicum.exception.RequestSelfAttendException;
 import ru.yandex.practicum.exception.ServiceException;
 import ru.yandex.practicum.exception.UserNotFoundException;
+import ru.yandex.practicum.grpc.user.action.ActionTypeProto;
 import ru.yandex.practicum.request.mapper.RequestMapper;
 import ru.yandex.practicum.request.model.Request;
 import ru.yandex.practicum.request.repository.RequestRepository;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -45,6 +48,7 @@ public class RequestServiceImpl implements RequestService {
     private final RequestMapper requestMapper;
     private final UserServiceClient userServiceClient;
     private final EventServiceClient eventServiceClient;
+    private final CollectorClient collectorClient;
 
     @Getter
     @Value("${spring.application.name}")
@@ -89,6 +93,8 @@ public class RequestServiceImpl implements RequestService {
                 .build();
 
         Request savedRequest = requestRepository.save(request);
+
+        collectorClient.collectUserAction(userId, eventId, ActionTypeProto.ACTION_REGISTER.toString() , Instant.now());
 
         log.info("{}. createRequest success {}", getServiceName(), request.getId());
 
